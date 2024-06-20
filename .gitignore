@@ -1,0 +1,136 @@
+# Flutter & Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache
+build/
+.idea/
+.vscode/
+*.iml
+
+# Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/.vscode
+android/app/build/
+android/app/release/
+android/app/debug/
+
+# iOS
+ios/Flutter/.generated/
+ios/.symlinks/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/App.framework/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/ServiceDefinitions.json
+ios/ServiceDefinitions.json.log
+ios/Flutter/Generated.xcconfig
+
+# Web
+web/manifest.json
+web/main.dart.js
+web/main.dart.js.map
+
+# MacOS
+macos/.symlinks/
+macos/Pods/
+macos/Flutter/ephemeral/
+macos/.vscode/
+macos/build/
+
+# Windows
+windows/ephemeral/
+windows/.vscode/
+windows/build/
+
+# Linux
+linux/ephemeral/
+linux/.vscode/
+linux/build/
+
+# Misc
+*.log
+*.tmp
+*.temp
+*.bak
+
+# Django
+*.pyc
+__pycache__/
+db.sqlite3
+db.sqlite3-journal
+
+# Environments
+.env
+venv/
+venv.bak/
+*.env
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+.share/
+.python-version
+
+# Distribution / packaging
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+*.log
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+local_settings.py
+.env
+
+# Static files
+staticfiles/
+
+# Media files
+media/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# C extensions
+*.so
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# profiling data
+.prof
