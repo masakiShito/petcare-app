@@ -74,12 +74,24 @@ WSGI_APPLICATION = "petcare_backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# settings.py
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'comnazublog_testdb',  # データベース名
+        'USER': 'comnazublog_test',      # データベースユーザー名
+        'PASSWORD': 'password',  # データベースパスワード
+        'HOST': '127.0.0.1',            # ローカルホスト
+        'PORT': '3307',                 # ローカルポート3307
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'ssl': {'disabled': True},
+        },
     }
 }
+import pymysql
+pymysql.install_as_MySQLdb()
 
 
 # Password validation
