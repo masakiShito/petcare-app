@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from pets.views import LoginView  # pets.views のインポートパスを使用
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('api/login/', LoginView.as_view(), name='login'),
 ]
