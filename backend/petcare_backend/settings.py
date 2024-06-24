@@ -86,20 +86,34 @@ WSGI_APPLICATION = "petcare_backend.wsgi.application"
 
 # settings.py
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'comnazublog_testdb',  # データベース名
+#         'USER': 'comnazublog_test',    # データベースユーザー名
+#         'PASSWORD': 'password',        # データベースパスワード
+#         'HOST': '127.0.0.1',           # ローカルホスト
+#         'PORT': '3307',                # ローカルポート3307
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#             'ssl': {'disabled': True},
+#         },
+#         'TEST': {
+#             'MIRROR': 'default',  # デフォルトのデータベース設定を使用
+#         },
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'comnazublog_testdb',  # データベース名
-        'USER': 'comnazublog_test',    # データベースユーザー名
-        'PASSWORD': 'password',        # データベースパスワード
-        'HOST': '127.0.0.1',           # ローカルホスト
-        'PORT': '3307',                # ローカルポート3307
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'ssl': {'disabled': True},
-        },
+        'NAME': 'mydatabase',
+        'USER': 'user',  # MySQLのユーザー名
+        'PASSWORD': 'pass',  # MySQLのパスワード
+        'HOST': 'localhost',
+        'PORT': '3306',
         'TEST': {
-            'MIRROR': 'default',  # デフォルトのデータベース設定を使用
+             'MIRROR': 'default',  # デフォルトのデータベース設定を使用
         },
     }
 }
