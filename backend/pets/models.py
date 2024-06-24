@@ -1,19 +1,9 @@
 from django.db import models
-
+from django.conf import settings
 # Create your models here.
 
-class User(models.Model):
-    username = models.CharField(max_length=255, unique=True)
-    email = models.CharField(max_length=255, unique=True)
-    password = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.username
-
 class Pet(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     species = models.CharField(max_length=255)
     birthday = models.DateField(null=True, blank=True)
@@ -64,7 +54,7 @@ class TrainingRecord(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class EmergencyContact(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     contact_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=255)
     address = models.CharField(max_length=255, null=True, blank=True)
@@ -73,17 +63,24 @@ class EmergencyContact(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class ForumPost(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 class Event(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     event_name = models.CharField(max_length=255)
     event_date = models.DateField()
     location = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class GrowthRecord(models.Model):
+    pet = models.ForeignKey(Pet, related_name='growth_records', on_delete=models.CASCADE)
+    entry_date = models.DateField()
+    note = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
