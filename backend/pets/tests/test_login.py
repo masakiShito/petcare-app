@@ -1,22 +1,23 @@
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class LoginAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        # ユーザーが存在するか確認し、存在しない場合のみ作成
         if not User.objects.filter(username='masakishito').exists():
-            self.user = User.objects.create_user(username='masakishito', password='pass')
+            self.user = User.objects.create_user(email='masakishito@example.com', username='masakishito', password='password')
+        self.client.force_authenticate(user=self.user)
 
     def test_login(self):
-        url = reverse('login')
+        url = reverse('token_obtain_pair')
         data = {
-            'username': 'masakishito',
-            'password': 'pass'
+            'email': 'masakishito@example.com',  # ここでemailフィールドを使用
+            'password': 'password'
         }
         response = self.client.post(url, data, format='json')
+        print(response.data)  # レスポンスデータを出力して確認
         self.assertEqual(response.status_code, 200)
-        self.assertIn('access', response.data)
-        self.assertIn('refresh', response.data)

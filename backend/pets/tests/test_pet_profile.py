@@ -9,7 +9,7 @@ User = get_user_model()
 class PetProfileAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='tempuser', password='temppass')
+        self.user = User.objects.create_user(email='tempuser@example.com', username='tempuser', password='temppass')
         self.client.force_authenticate(user=self.user)
         self.pet = Pet.objects.create(user=self.user, name='Buddy', species='Dog')
 
@@ -31,9 +31,11 @@ class PetProfileAPITest(TestCase):
             'birthday': '2021-01-01',
             'gender': 'Female',
             'weight': 4.5,
-            'height': 30.0
+            'height': 30.0,
+            'user': self.user.id  # userフィールドを追加
         }
         response = self.client.post(url, data, format='json')
+        print(response.data)  # レスポンスデータを出力して確認
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Pet.objects.count(), 2)
         self.assertEqual(Pet.objects.get(name='Kitty').species, 'Cat')
