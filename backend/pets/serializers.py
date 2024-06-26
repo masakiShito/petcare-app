@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event
+from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event, Veterinarian, HealthCheckupReminder
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,3 +57,13 @@ class PetSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             validated_data['user'] = request.user
         return super().create(validated_data)
+
+class VeterinarianSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Veterinarian
+        fields = ['id', 'pet', 'name', 'phone_number', 'email']
+
+class HealthCheckupReminderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HealthCheckupReminder
+        fields = ['id', 'pet', 'checkup_date', 'reminder']

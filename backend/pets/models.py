@@ -84,3 +84,20 @@ class GrowthRecord(models.Model):
     note = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Veterinarian(models.Model):
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def __str__(self):
+        return self.name
+
+class HealthCheckupReminder(models.Model):
+    pet = models.ForeignKey(Pet, on_delete=models.CASCADE)
+    checkup_date = models.DateField()
+    reminder = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.pet.name} - Checkup on {self.checkup_date}"
