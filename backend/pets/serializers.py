@@ -51,6 +51,7 @@ class PetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pet
         fields = '__all__'
+        read_only_fields = ['user', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         request = self.context.get('request', None)
