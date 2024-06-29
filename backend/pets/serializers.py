@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event, Veterinarian, HealthCheckupReminder
+from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event, Veterinarian, HealthCheckupReminder, PetFoodRecommendation, EmergencyGuide
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -67,3 +67,18 @@ class HealthCheckupReminderSerializer(serializers.ModelSerializer):
     class Meta:
         model = HealthCheckupReminder
         fields = ['id', 'pet', 'checkup_date', 'reminder']
+
+class MealRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MealRecord
+        fields = '__all__'
+
+class PetFoodRecommendationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetFoodRecommendation
+        fields = '__all__'
+
+class EmergencyGuideSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmergencyGuide
+        fields = '__all__'

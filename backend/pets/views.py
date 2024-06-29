@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event
-from .serializers import PetSerializer, HealthRecordSerializer, GrowthRecordSerializer, VaccinationSerializer, MealRecordSerializer, TrainingRecordSerializer, EmergencyContactSerializer, ForumPostSerializer, EventSerializer
+from .models import Pet, HealthRecord, GrowthRecord, Vaccination, MealRecord, TrainingRecord, EmergencyContact, ForumPost, Event, PetFoodRecommendation, EmergencyGuide
+from .serializers import PetSerializer, HealthRecordSerializer, GrowthRecordSerializer, VaccinationSerializer, MealRecordSerializer, TrainingRecordSerializer, EmergencyContactSerializer, ForumPostSerializer, EventSerializer, PetFoodRecommendationSerializer, EmergencyGuideSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class PetViewSet(viewsets.ModelViewSet):
@@ -77,3 +77,15 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
+    
+class MealRecordViewSet(viewsets.ModelViewSet):
+    queryset = MealRecord.objects.all()
+    serializer_class = MealRecordSerializer
+
+class PetFoodRecommendationViewSet(viewsets.ModelViewSet):
+    queryset = PetFoodRecommendation.objects.all()
+    serializer_class = PetFoodRecommendationSerializer
+
+class EmergencyGuideViewSet(viewsets.ModelViewSet):
+    queryset = EmergencyGuide.objects.all()
+    serializer_class = EmergencyGuideSerializer
