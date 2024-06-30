@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/custom_text_form_field.dart';
 import '../widgets/custom_button.dart';
 
@@ -63,6 +64,15 @@ class _LoginScreenState extends State<LoginScreen>
     });
 
     if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      final accessToken = responseData['access'];
+      final refreshToken = responseData['refresh'];
+
+      // トークンを保存
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('accessToken', accessToken);
+      await prefs.setString('refreshToken', refreshToken);
+
       // ログイン成功、ホーム画面へ遷移
       Navigator.pushReplacementNamed(context, '/home');
     } else {
