@@ -134,3 +134,7 @@ dmypy.json
 
 # profiling data
 .prof
+
+# Ensure lib/ is tracked
+!lib/
+!lib/**
