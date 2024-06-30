@@ -50,6 +50,8 @@ dev_dependencies:
 
   shared_preferences: ^2.0.6
 
+  logging: ^1.0.2
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
