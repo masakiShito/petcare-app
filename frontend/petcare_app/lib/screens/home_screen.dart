@@ -64,39 +64,64 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pet Care App'),
+        backgroundColor: Colors.green, // AppBarの色を緑に設定
       ),
       body: _isLoading
-          ? Center(child: CircularProgressIndicator()) // ローディング中はインジケーターを表示
+          ? Center(
+              child: CircularProgressIndicator(
+                  color: Colors.green)) // ローディング中は緑のインジケーターを表示
           : pets.isEmpty
-              ? Center(child: Text('No pets found'))
+              ? Center(
+                  child: Text('No pets found',
+                      style: TextStyle(color: Colors.green)))
               : ListView.builder(
                   itemCount: pets.length,
                   itemBuilder: (context, index) {
                     final pet = pets[index];
-                    final imageUrl = pet['image'];
+                    final imageUrl = pet['photo'];
                     return Card(
                       margin: EdgeInsets.all(10.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
+                      color: Colors.green[50], // カードの背景色を緑系に設定
                       child: ListTile(
-                        leading: imageUrl != null && imageUrl.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(imageUrl),
-                              )
-                            : CircleAvatar(
-                                backgroundImage:
-                                    AssetImage('assets/default_image.jpg'),
-                              ),
+                        leading: CircleAvatar(
+                          backgroundImage:
+                              imageUrl != null && imageUrl.isNotEmpty
+                                  ? NetworkImage(imageUrl)
+                                  : AssetImage('assets/default_image.jpg'),
+                          radius: 30.0,
+                        ),
                         title: Text(
                           pet['name'] ?? 'Unknown',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
+                            color: Colors.green[800], // タイトルの色を濃い緑に設定
                           ),
                         ),
-                        subtitle: Text(pet['species'] ?? 'Unknown'),
-                        trailing: Text(
-                            '誕生日 ${pet['birthday']?.toString() ?? 'Unknown'} '),
+                        subtitle: Text(
+                          pet['species'] ?? 'Unknown',
+                          style: TextStyle(
+                              color: Colors.green[600]), // サブタイトルの色を緑に設定
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '誕生日',
+                              style: TextStyle(
+                                color: Colors.green[700], // 誕生日ラベルの色を緑に設定
+                              ),
+                            ),
+                            Text(
+                              pet['birthday']?.toString() ?? 'Unknown',
+                              style: TextStyle(
+                                color: Colors.green[900], // 誕生日の色を濃い緑に設定
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
