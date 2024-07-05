@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'dart:convert'; // 追加：UTF-8デコード用
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,19 +32,27 @@ class _HomeScreenState extends State<HomeScreen> {
         );
 
         if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          setState(() {
-            pets = data['pets'];
-            _isLoading = false; // ローディングを終了
-          });
+          // UTF-8デコード
+          final data = json.decode(utf8.decode(response.bodyBytes));
+          if (data != null && data is List) {
+            setState(() {
+              pets = data;
+              _isLoading = false; // ローディングを終了
+            });
+          } else {
+            print('Unexpected response format');
+            setState(() {
+              _isLoading = false; // エラー時にもローディングを終了
+            });
+          }
         } else {
-          throw Exception('Failed to fetch pets');
+          throw Exception('Failed to fetch pets: ${response.reasonPhrase}');
         }
       } else {
         throw Exception('Access token not found');
       }
     } catch (e) {
-      print(e);
+      print('Error fetching pets: $e');
       setState(() {
         _isLoading = false; // エラー時にもローディングを終了
       });
@@ -65,23 +73,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: pets.length,
                   itemBuilder: (context, index) {
                     final pet = pets[index];
+                    final imageUrl = pet['image'];
                     return Card(
                       margin: EdgeInsets.all(10.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: NetworkImage(pet['image']),
-                        ),
+                        leading: imageUrl != null && imageUrl.isNotEmpty
+                            ? CircleAvatar(
+                                backgroundImage: NetworkImage(imageUrl),
+                              )
+                            : CircleAvatar(
+                                backgroundImage:
+                                    AssetImage('assets/default_image.jpg'),
+                              ),
                         title: Text(
-                          pet['name'],
+                          pet['name'] ?? 'Unknown',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Text(pet['breed']),
-                        trailing: Text('${pet['age']} years'),
+                        subtitle: Text(pet['species'] ?? 'Unknown'),
+                        trailing: Text(
+                            '誕生日 ${pet['birthday']?.toString() ?? 'Unknown'} '),
                       ),
                     );
                   },
