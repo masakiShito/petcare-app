@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/pet_registration_screen.dart';
+import 'services/auth_service.dart'; // AuthServiceのインポート
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -18,7 +21,22 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/home': (context) => HomeScreen(),
+        '/register': (context) => PetRegistrationScreen(),
       },
     );
+  }
+}
+
+class TokenRefreshManager {
+  final AuthService _authService = AuthService();
+
+  void start() {
+    Timer.periodic(Duration(minutes: 15), (timer) async {
+      try {
+        await _authService.refreshToken();
+      } catch (e) {
+        print('Failed to refresh token: $e');
+      }
+    });
   }
 }

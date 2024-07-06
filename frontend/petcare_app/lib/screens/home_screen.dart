@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // 追加：UTF-8デコード用
 import 'package:shared_preferences/shared_preferences.dart';
+import 'pet_detail_screen.dart'; // 追加：PetDetailScreenのインポート
+import '../services/auth_service.dart'; // AuthServiceのインポート
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,17 +13,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> pets = [];
   bool _isLoading = true; // ローディング状態を管理するフラグ
+  final AuthService _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _authService.refreshToken();
     fetchPets();
   }
 
   Future<void> fetchPets() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      String? accessToken = await _authService.getAccessToken();
 
       if (accessToken != null) {
         final response = await http.get(
@@ -59,6 +66,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  bool _isValidUrl(String? url) {
+    if (url == null || url.isEmpty) {
+      return false;
+    }
+    Uri? uri = Uri.tryParse(url);
+    return uri != null &&
+        uri.hasAbsolutePath &&
+        (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: pets.length,
                   itemBuilder: (context, index) {
                     final pet = pets[index];
-                    final imageUrl = pet['photo'];
+                    final imageUrl =
+                        _isValidUrl(pet['photo']) ? pet['photo'] : null;
                     return Card(
                       margin: EdgeInsets.all(10.0),
                       shape: RoundedRectangleBorder(
@@ -86,11 +104,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       color: Colors.green[50], // カードの背景色を緑系に設定
                       child: ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PetDetailScreen(pet: pet),
+                            ),
+                          );
+                        },
                         leading: CircleAvatar(
-                          backgroundImage:
-                              imageUrl != null && imageUrl.isNotEmpty
-                                  ? NetworkImage(imageUrl)
-                                  : AssetImage('assets/default_image.jpg'),
+                          backgroundImage: imageUrl != null
+                              ? NetworkImage(imageUrl)
+                              : AssetImage('assets/default_image.jpg'),
                           radius: 30.0,
                         ),
                         title: Text(
@@ -126,6 +151,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   },
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result =
+              await Navigator.pushNamed(context, '/register'); // ペット登録画面に遷移
+          if (result == true) {
+            // ペット登録が成功した場合に再度ペットデータをフェッチ
+            setState(() {
+              _isLoading = true;
+            });
+            fetchPets();
+          }
+        },
+        child: Icon(Icons.add),
+        backgroundColor: Colors.green, // FABの色を緑に設定
+      ),
     );
   }
 }
