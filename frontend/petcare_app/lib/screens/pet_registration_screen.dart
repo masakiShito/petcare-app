@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 
 class PetRegistrationScreen extends StatefulWidget {
   @override
@@ -36,7 +37,8 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
         request.fields['name'] = _name!;
         request.fields['species'] = _species!;
         if (_birthday != null) {
-          request.fields['birthday'] = _birthday!.toIso8601String();
+          request.fields['birthday'] =
+              _birthday!.toIso8601String().split('T').first;
         }
         request.fields['gender'] = _gender!;
         request.fields['weight'] = _weight.toString();
@@ -55,23 +57,58 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
           var responseData = await response.stream.bytesToString();
           print(
               'Failed to register pet: ${response.statusCode} - $responseData');
-          // エラーハンドリングを追加してください
         }
       } else {
         print('Access token not found');
-        // エラーハンドリングを追加してください
       }
     }
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
 
-    if (pickedFile != null) {
-      setState(() {
-        _photo = File(pickedFile.path);
-      });
+  Future<void> _checkPermission() async {
+    if (await Permission.photos.isDenied) {
+      await Permission.photos.request();
+    }
+  }
+
+  Future<void> _pickImage() async {
+    if (await Permission.photos.request().isGranted) {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          _photo = File(pickedFile.path);
+        });
+      }
+    } else {
+      if (await Permission.photos.isPermanentlyDenied) {
+        openAppSettings();
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Permission denied'),
+              content:
+                  Text('Photo library access is required to pick an image.'),
+              actions: [
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
@@ -115,7 +152,7 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
               ListTile(
                 title: Text(_birthday == null
                     ? 'Select Birthday'
-                    : 'Birthday: ${_birthday!.toLocal()}'),
+                    : 'Birthday: ${_birthday!.toLocal()}'.split(' ')[0]),
                 trailing: Icon(Icons.calendar_today),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(

@@ -10,7 +10,7 @@ class Pet(models.Model):
     species = models.CharField(max_length=255)
     birthday = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=50, null=True, blank=True)
-    photo = models.CharField(max_length=255, null=True, blank=True)
+    photo = models.ImageField(upload_to='pet_photos/', null=True, blank=True)  # この行を変更
     weight = models.FloatField(null=True, blank=True)
     height = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
