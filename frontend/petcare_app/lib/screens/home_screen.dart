@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert'; // 追加：UTF-8デコード用
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'pet_detail_screen.dart'; // 追加：PetDetailScreenのインポート
-import '../services/auth_service.dart'; // AuthServiceのインポート
+import '../services/auth_service.dart'; // 追加
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -12,23 +11,18 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> pets = [];
-  bool _isLoading = true; // ローディング状態を管理するフラグ
-  final AuthService _authService = AuthService();
+  bool _isLoading = true;
+  final AuthService _authService = AuthService(); // 追加
 
   @override
   void initState() {
     super.initState();
-    _initialize();
-  }
-
-  Future<void> _initialize() async {
-    await _authService.refreshToken();
     fetchPets();
   }
 
   Future<void> fetchPets() async {
     try {
-      String? accessToken = await _authService.getAccessToken();
+      String? accessToken = await _authService.getAccessToken(); // 変更
 
       if (accessToken != null) {
         final response = await http.get(
@@ -39,17 +33,16 @@ class _HomeScreenState extends State<HomeScreen> {
         );
 
         if (response.statusCode == 200) {
-          // UTF-8デコード
           final data = json.decode(utf8.decode(response.bodyBytes));
           if (data != null && data is List) {
             setState(() {
               pets = data;
-              _isLoading = false; // ローディングを終了
+              _isLoading = false;
             });
           } else {
             print('Unexpected response format');
             setState(() {
-              _isLoading = false; // エラー時にもローディングを終了
+              _isLoading = false;
             });
           }
         } else {
@@ -61,19 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print('Error fetching pets: $e');
       setState(() {
-        _isLoading = false; // エラー時にもローディングを終了
+        _isLoading = false;
       });
     }
-  }
-
-  bool _isValidUrl(String? url) {
-    if (url == null || url.isEmpty) {
-      return false;
-    }
-    Uri? uri = Uri.tryParse(url);
-    return uri != null &&
-        uri.hasAbsolutePath &&
-        (uri.scheme == 'http' || uri.scheme == 'https');
   }
 
   @override
@@ -81,7 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Pet Care App'),
-        backgroundColor: Colors.green,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
@@ -120,7 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/register'),
+        onPressed: () {
+          Navigator.pushNamed(context, '/register');
+        },
         child: Icon(Icons.add),
         backgroundColor: Colors.green,
       ),

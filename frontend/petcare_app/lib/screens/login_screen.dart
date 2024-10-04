@@ -83,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -161,6 +162,16 @@ class _LoginScreenState extends State<LoginScreen>
                         },
                         backgroundColor: Colors.green,
                         textColor: Colors.white,
+                      ),
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/signup');
+                        },
+                        child: Text(
+                          'Create an account',
+                          style: TextStyle(color: Colors.green),
+                        ),
                       ),
                     ],
                   ),
