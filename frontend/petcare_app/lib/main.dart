@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/pet_registration_screen.dart';
-import 'services/auth_service.dart'; // AuthServiceのインポート
+import 'services/auth_service.dart';
+import 'screens/signup_screen.dart';
 import 'dart:async';
 
 void main() {
@@ -20,6 +21,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginScreen(),
+        '/login': (context) => LoginScreen(), // ログイン画面のルート
+        '/signup': (context) => SignupScreen(),
         '/home': (context) => HomeScreen(),
         '/register': (context) => PetRegistrationScreen(),
       },
