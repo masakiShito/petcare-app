@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 ]
 
 REST_FRAMEWORK = {
@@ -110,14 +111,11 @@ WSGI_APPLICATION = "petcare_backend.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydatabase',
-        'USER': 'user',  # MySQLのユーザー名
-        'PASSWORD': 'pass',  # MySQLのパスワード
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'TEST': {
-             'MIRROR': 'default',  # デフォルトのデータベース設定を使用
-        },
+        'NAME': 'mydatabase',  # MySQLのデータベース名
+        'USER': 'root',      # MySQLのユーザー名
+        'PASSWORD': 'rootpassword',  # MySQLのパスワード
+        'HOST': 'localhost',          # Docker Composeのサービス名
+        'PORT': '3306',        # MySQLのポート
     }
 }
 
@@ -164,7 +162,7 @@ from datetime import timedelta
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
