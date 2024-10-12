@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import '../services/auth_service.dart'; // AuthService をインポート
+import 'package:http/http.dart' as http;
 
 class PetRegistrationScreen extends StatefulWidget {
   @override
@@ -19,20 +19,24 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
   double? _weight;
   double? _height;
   File? _photo;
+  final AuthService _authService = AuthService(); // AuthService をインスタンス化
 
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? accessToken = prefs.getString('accessToken');
+      // AuthServiceを使用してアクセストークンを取得
+      String? accessToken = await _authService.getAccessToken();
+      print('accessToken: $accessToken'); // トークンが取得できているか確認
 
       if (accessToken != null) {
         var request = http.MultipartRequest(
           'POST',
           Uri.parse('http://localhost:8000/api/pets/'),
         );
+
         request.headers['Authorization'] = 'Bearer $accessToken';
+        request.headers['Content-Type'] = 'multipart/form-data';
 
         request.fields['name'] = _name!;
         request.fields['species'] = _species!;
@@ -53,6 +57,10 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
 
         if (response.statusCode == 201) {
           Navigator.pop(context, true); // 登録成功後に成功フラグを渡して戻る
+        } else if (response.statusCode == 401) {
+          // アクセストークンが無効な場合、リフレッシュ処理を試みる
+          await _authService.refreshToken();
+          _submitForm(); // 再度リクエスト
         } else {
           var responseData = await response.stream.bytesToString();
           print(
@@ -94,9 +102,8 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Permission denied'),
-              content:
-                  Text('Photo library access is required to pick an image.'),
+              title: Text('権限が拒否されました'),
+              content: Text('画像を選択するには写真ライブラリのアクセスが必要です。'),
               actions: [
                 TextButton(
                   child: Text('OK'),
@@ -116,7 +123,7 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register Pet'),
+        title: Text('ペット登録'),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -126,10 +133,10 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
           child: ListView(
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: '名前'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the pet\'s name';
+                    return 'ペットの名前を入力してください';
                   }
                   return null;
                 },
@@ -138,10 +145,10 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Species'),
+                decoration: InputDecoration(labelText: '種類'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the pet\'s species';
+                    return 'ペットの種類を入力してください';
                   }
                   return null;
                 },
@@ -151,8 +158,8 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
               ),
               ListTile(
                 title: Text(_birthday == null
-                    ? 'Select Birthday'
-                    : 'Birthday: ${_birthday!.toLocal()}'.split(' ')[0]),
+                    ? '誕生日を選択'
+                    : '誕生日: ${_birthday!.toLocal()}'.split(' ')[0]),
                 trailing: Icon(Icons.calendar_today),
                 onTap: () async {
                   DateTime? picked = await showDatePicker(
@@ -169,8 +176,8 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
                 },
               ),
               DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: 'Gender'),
-                items: <String>['Male', 'Female'].map((String value) {
+                decoration: InputDecoration(labelText: '性別'),
+                items: <String>['オス', 'メス'].map((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
@@ -178,7 +185,7 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
                 }).toList(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select the pet\'s gender';
+                    return 'ペットの性別を選択してください';
                   }
                   return null;
                 },
@@ -189,11 +196,11 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Weight (kg)'),
+                decoration: InputDecoration(labelText: '体重 (kg)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the pet\'s weight';
+                    return 'ペットの体重を入力してください';
                   }
                   return null;
                 },
@@ -202,11 +209,11 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
                 },
               ),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Height (cm)'),
+                decoration: InputDecoration(labelText: '身長 (cm)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter the pet\'s height';
+                    return 'ペットの身長を入力してください';
                   }
                   return null;
                 },
@@ -217,16 +224,16 @@ class _PetRegistrationScreenState extends State<PetRegistrationScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Pick an image'),
+                child: Text('画像を選択'),
               ),
               SizedBox(height: 20),
               _photo == null
-                  ? Text('No image selected.')
+                  ? Text('画像が選択されていません。')
                   : Image.file(_photo!, height: 200),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Register Pet'),
+                child: Text('ペットを登録'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                 ),
