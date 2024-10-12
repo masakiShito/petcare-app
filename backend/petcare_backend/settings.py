@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-i1pe9zzm)_4rm6ude3dn0x1$9uhm7jm8_tck)xd=140#k5l7%m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -162,7 +162,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -230,3 +230,10 @@ DEFAULT_CHARSET = 'utf-8'
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',  # Reactなどのフロントエンドが動作している場合
+    'http://yourfrontend.com'  # 本番環境のフロントエンドURL
+]
+
+CSRF_COOKIE_SECURE = False  # 開発中であれば無効
