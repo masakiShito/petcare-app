@@ -1,107 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/custom_text_form_field.dart';
-import '../widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
-  late AnimationController _animationController;
-  late Animation<double> _animation;
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _login() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/login/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'email': _emailController.text,
-        'password': _passwordController.text,
-      }),
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      final accessToken = responseData['access'];
-      final refreshToken = responseData['refresh'];
-
-      // トークンを保存
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('accessToken', accessToken);
-      await prefs.setString('refreshToken', refreshToken);
-
-      // ログイン成功、ホーム画面へ遷移
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      setState(() {
-        _errorMessage = 'Login failed. Please check your email and password.';
-      });
-    }
-  }
-
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.green.shade200],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      body: Stack(
+        children: [
+          // 背景に足跡のパターン画像を表示
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'assets/pet_pattern_background.png'), // 背景画像をここで指定
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-        ),
-        child: Center(
-          child: ScaleTransition(
-            scale: _animation,
+          Center(
             child: Card(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
+                borderRadius: BorderRadius.circular(25.0),
               ),
-              color: Colors.white,
+              color: Colors.white.withOpacity(0.9),
               margin: EdgeInsets.all(16.0),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -111,34 +42,41 @@ class _LoginScreenState extends State<LoginScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Welcome Back',
+                        'ようこそ Pet Care App へ',
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'CuteFont',
                           color: Colors.green.shade700,
                         ),
                       ),
                       SizedBox(height: 16.0),
-                      CustomTextFormField(
+                      TextFormField(
                         controller: _emailController,
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email, color: Colors.green),
+                        decoration: InputDecoration(
+                          labelText: 'メールアドレス',
+                          prefixIcon:
+                              Icon(Icons.email, color: Colors.green.shade700),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your email';
+                            return 'メールアドレスを入力してください';
                           }
                           return null;
                         },
                       ),
                       SizedBox(height: 16.0),
-                      CustomTextFormField(
+                      TextFormField(
                         controller: _passwordController,
-                        labelText: 'Password',
-                        prefixIcon: Icon(Icons.lock, color: Colors.green),
+                        decoration: InputDecoration(
+                          labelText: 'パスワード',
+                          prefixIcon:
+                              Icon(Icons.lock, color: Colors.green.shade700),
+                        ),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return 'パスワードを入力してください';
                           }
                           return null;
                         },
@@ -153,15 +91,17 @@ class _LoginScreenState extends State<LoginScreen>
                             style: TextStyle(color: Colors.red),
                           ),
                         ),
-                      CustomButton(
-                        text: 'Login',
+                      ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
-                            _login();
+                            // ログイン処理
                           }
                         },
-                        backgroundColor: Colors.green,
-                        textColor: Colors.white,
+                        child: Text('ログイン'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade400,
+                          foregroundColor: Colors.white,
+                        ),
                       ),
                       SizedBox(height: 10),
                       TextButton(
@@ -169,8 +109,8 @@ class _LoginScreenState extends State<LoginScreen>
                           Navigator.pushNamed(context, '/signup');
                         },
                         child: Text(
-                          'Create an account',
-                          style: TextStyle(color: Colors.green),
+                          'アカウントを作成',
+                          style: TextStyle(color: Colors.green.shade700),
                         ),
                       ),
                     ],
@@ -179,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen>
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

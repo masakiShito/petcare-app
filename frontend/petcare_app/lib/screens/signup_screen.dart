@@ -15,6 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+
   Future<void> _signup() async {
     setState(() {
       _isLoading = true;
@@ -41,12 +42,12 @@ class _SignupScreenState extends State<SignupScreen> {
       // サインアップ成功時にログイン画面へ遷移
       Navigator.pushReplacementNamed(context, '/login');
 
-      // メッセージを表示するためにSnackbarなども使えます
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Account created successfully. Please log in.')));
+      // 成功メッセージを表示
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('アカウントが作成されました。ログインしてください。')));
     } else {
       setState(() {
-        _errorMessage = 'Signup failed. Please try again.';
+        _errorMessage = 'サインアップに失敗しました。もう一度お試しください。';
       });
     }
   }
@@ -62,98 +63,126 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          color: Colors.white,
-          margin: EdgeInsets.all(16.0),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700,
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      prefixIcon: Icon(Icons.person, color: Colors.green),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email, color: Colors.green),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Password',
-                      prefixIcon: Icon(Icons.lock, color: Colors.green),
-                    ),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  if (_isLoading) CircularProgressIndicator(),
-                  if (_errorMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        _signup();
-                      }
-                    },
-                    child: Text('Sign Up'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                ],
+      body: Stack(
+        children: [
+          // 背景に足跡パターン画像を表示
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    'assets/pet_pattern_background.png'), // 足跡の背景画像を指定
+                fit: BoxFit.cover,
               ),
             ),
           ),
-        ),
+          Center(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              color: Colors.white.withOpacity(0.9), // 背景に合わせて透明度を調整
+              margin: EdgeInsets.all(16.0),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'サインアップ',
+                        style: TextStyle(
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'CuteFont',
+                          color: Colors.green.shade700,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          labelText: 'ユーザー名',
+                          prefixIcon:
+                              Icon(Icons.person, color: Colors.green.shade700),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'ユーザー名を入力してください';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          labelText: 'メールアドレス',
+                          prefixIcon:
+                              Icon(Icons.email, color: Colors.green.shade700),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'メールアドレスを入力してください';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'パスワード',
+                          prefixIcon:
+                              Icon(Icons.lock, color: Colors.green.shade700),
+                        ),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'パスワードを入力してください';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      if (_isLoading) CircularProgressIndicator(),
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: Text(
+                            _errorMessage!,
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            _signup();
+                          }
+                        },
+                        child: Text('サインアップ'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade400,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        child: Text(
+                          '既にアカウントをお持ちの方はこちらからログイン',
+                          style: TextStyle(color: Colors.green.shade700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

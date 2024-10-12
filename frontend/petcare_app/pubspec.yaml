@@ -39,6 +39,7 @@ dependencies:
   permission_handler: ^10.2.0
   shared_preferences: ^2.0.8
   http: ^1.2.1
+  flutter_secure_storage: ^4.2.0
 
 dev_dependencies:
   flutter_test:
@@ -96,3 +97,4 @@ flutter:
 
   assets:
     - assets/default_image.jpg
+    - assets/pet_pattern_background.png
